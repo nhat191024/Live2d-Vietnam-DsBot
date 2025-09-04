@@ -5,10 +5,6 @@ services:
       dockerfile: Dockerfile
     container_name: live2d-discord-bot
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - DB_HOST=mysql
-      - DB_PORT=3306
     env_file:
       - .env
     volumes:
