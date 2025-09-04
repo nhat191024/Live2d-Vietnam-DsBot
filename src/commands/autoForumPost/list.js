@@ -72,7 +72,6 @@ class ListCommand extends BaseCommand {
                 name: `Thiết lập #${i + 1}`,
                 value: `📝 **Kênh nguồn:** ${sourceChannelName}\n` +
                     `📋 **Kênh forum:** ${forumChannelName}\n` +
-                    `🏷️ **Tag:** ${setting.tag_name}\n` +
                     `📅 **Tạo lúc:** <t:${Math.floor(new Date(setting.created_at).getTime() / 1000)}:R>`,
                 inline: true
             });

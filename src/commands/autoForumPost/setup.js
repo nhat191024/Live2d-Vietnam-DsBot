@@ -22,12 +22,8 @@ class SetupCommand extends BaseCommand {
                     .setRequired(true))
             .addChannelOption(option =>
                 option.setName('forum-channel')
-                    .setDescription('Forum channel to create posts in')
+                    .setDescription('Forum channel to send messages to')
                     .addChannelTypes(ChannelType.GuildForum)
-                    .setRequired(true))
-            .addStringOption(option =>
-                option.setName('tag-name')
-                    .setDescription('Tag name to apply to forum posts')
                     .setRequired(true))
             .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
     }
@@ -37,23 +33,21 @@ class SetupCommand extends BaseCommand {
             if (this.isSlashCommand(interaction)) {
                 const sourceChannel = interaction.options.getChannel('source-channel');
                 const forumChannel = interaction.options.getChannel('forum-channel');
-                const tagName = interaction.options.getString('tag-name');
 
-                return await this.handleSetup(interaction, sourceChannel, forumChannel, tagName);
+                return await this.handleSetup(interaction, sourceChannel, forumChannel);
             } else {
-                // Prefix command: !autoforumpost-setup #source #forum "tag name"
+                // Prefix command: !autoforumpost-setup #source #forum
                 const commandArgs = interaction._args || [];
-                if (commandArgs.length < 3) {
-                    return await interactions.reply({
-                        content: '❌ Cách dùng: `!autoforumpost-setup #kênh-nguồn #kênh-forum "tên tag"`',
+                if (commandArgs.length < 2) {
+                    return await interaction.reply({
+                        content: '❌ Cách dùng: `!autoforumpost_setup #kênh-nguồn #kênh-forum`',
                         ephemeral: true
                     });
                 }
 
-                // Parse channel mentions and tag name
+                // Parse channel mentions
                 const sourceChannelId = commandArgs[0].replace(/[<#>]/g, '');
                 const forumChannelId = commandArgs[1].replace(/[<#>]/g, '');
-                const tagName = commandArgs.slice(2).join(' ').replace(/"/g, '');
 
                 const sourceChannel = interaction.guild.channels.cache.get(sourceChannelId);
                 const forumChannel = interaction.guild.channels.cache.get(forumChannelId);
@@ -62,7 +56,7 @@ class SetupCommand extends BaseCommand {
                     return await interaction.reply('❌ Kênh không hợp lệ!');
                 }
 
-                return await this.handleSetup(interaction, sourceChannel, forumChannel, tagName);
+                return await this.handleSetup(interaction, sourceChannel, forumChannel);
             }
         } catch (error) {
             console.error('Error in autoforumpost setup command:', error);
@@ -73,7 +67,7 @@ class SetupCommand extends BaseCommand {
         }
     }
 
-    async handleSetup(interaction, sourceChannel, forumChannel, tagName) {
+    async handleSetup(interaction, sourceChannel, forumChannel) {
         // Validate channels
         if (sourceChannel.type !== ChannelType.GuildText) {
             return await interaction.reply({
@@ -85,16 +79,6 @@ class SetupCommand extends BaseCommand {
         if (forumChannel.type !== ChannelType.GuildForum) {
             return await interaction.reply({
                 content: '❌ Kênh forum phải là kênh forum!',
-                ephemeral: true
-            });
-        }
-
-        // Check if tag exists in forum
-        const availableTag = forumChannel.availableTags.find(tag => tag.name === tagName);
-        if (!availableTag) {
-            const availableTags = forumChannel.availableTags.map(tag => tag.name).join(', ');
-            return await interaction.reply({
-                content: `❌ Không tìm thấy tag "${tagName}" trong kênh forum!\n**Các tag có sẵn:** ${availableTags || 'Không có'}`,
                 ephemeral: true
             });
         }
@@ -112,17 +96,15 @@ class SetupCommand extends BaseCommand {
         const success = await autoForumModule.saveSettings(
             interaction.guild.id,
             sourceChannel.id,
-            forumChannel.id,
-            tagName
+            forumChannel.id
         );
 
         if (success) {
             return await interaction.reply({
                 content: `✅ **Thiết lập Auto Forum Post hoàn tất!**\n\n` +
                     `📝 **Kênh nguồn:** ${sourceChannel}\n` +
-                    `📋 **Kênh forum:** ${forumChannel}\n` +
-                    `🏷️ **Tag:** ${tagName}\n\n` +
-                    `Tin nhắn trong ${sourceChannel} sẽ tự động tạo post trong ${forumChannel} với tag "${tagName}".`,
+                    `📋 **Kênh forum:** ${forumChannel}\n\n` +
+                    `Tin nhắn có hashtag trong ${sourceChannel} sẽ tự động được gửi đến thread phù hợp trong ${forumChannel}.`,
                 ephemeral: true
             });
         } else {
