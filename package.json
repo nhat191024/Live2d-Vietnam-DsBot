@@ -1,0 +1,26 @@
+{
+  "name": "live2d-discord-bot",
+  "version": "1.0.0",
+  "description": "Modular Discord bot built with Discord.js v14",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "modular",
+    "live2d"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.4",
+  "dependencies": {
+    "color": "^5.0.0",
+    "discord.js": "^14.22.1",
+    "dotenv": "^17.2.2",
+    "mysql2": "^3.14.4"
+  }
+}
