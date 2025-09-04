@@ -5,10 +5,5 @@ services:
       dockerfile: Dockerfile
     container_name: live2d-discord-bot
     restart: unless-stopped
-    env_file:
-      - .env
     volumes:
       - bot-logs:/app/logs
-
-volumes:
-  bot-logs:
