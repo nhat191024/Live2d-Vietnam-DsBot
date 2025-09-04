@@ -2,13 +2,16 @@
 
 ## Overview
 
-The XFixer module automatically detects X.com (formerly Twitter) links in Discord messages and converts them to fixvx.com links for better embed display.
+The XFixer module automatically detects X.com (formerly Twitter) links in Discord messages and converts them to fixvx.com links for better embed display. It includes channel exclusion functionality to prevent processing in specific channels.
 
 ## Features
 
 - **Automatic Detection**: Monitors all messages for X.com and Twitter.com links
 - **Smart Replacement**: Converts links to fixvx.com while preserving all parameters
-- **No Commands**: Fully automated, no user interaction required
+- **Message Deletion**: Automatically deletes original messages with X.com links (configurable)
+- **Channel Exclusion**: Ability to exclude specific channels from link fixing
+- **Management Commands**: Commands to manage excluded channels and settings
+- **Database Integration**: Persistent storage of exclusion settings and preferences
 - **Safe Processing**: Only processes valid URLs, handles errors gracefully
 
 ## How It Works
@@ -31,10 +34,41 @@ Fixed: `https://fixvx.com/pixelvertice/status/1951500101215777259?s=46`
 
 When X.com links are detected:
 
-1. Bot replaces domain with `fixvx.com`
-2. Sends new message with fixed links
-3. Attributes message to original author
-4. Prevents mention spam with `allowedMentions: { parse: [] }`
+1. Checks if channel is excluded from processing
+2. Bot replaces domain with `fixvx.com`
+3. Sends new message with fixed links
+4. Attributes message to original author
+5. Optionally deletes the original message (based on server settings)
+6. Prevents mention spam with `allowedMentions: { parse: [] }`
+
+## Commands
+
+### `/xfixer_exclude`
+
+**Purpose**: Exclude a channel from X link fixing
+**Usage**: `/xfixer_exclude channel:#channel-name`
+**Permissions**: Manage Channels
+
+### `/xfixer_include`
+
+**Purpose**: Include a previously excluded channel back in X link fixing
+**Usage**: `/xfixer_include channel:#channel-name`
+**Permissions**: Manage Channels
+
+### `/xfixer_list`
+
+**Purpose**: List all channels excluded from X link fixing
+**Usage**: `/xfixer_list`
+**Permissions**: Manage Channels
+
+### `/xfixer_settings`
+
+**Purpose**: Manage XFixer settings for the server
+**Usage**:
+
+- `/xfixer_settings view` - View current settings
+- `/xfixer_settings delete-original true/false` - Toggle message deletion
+  **Permissions**: Manage Channels
 
 ## Configuration
 
@@ -45,9 +79,36 @@ When X.com links are detected:
 MODULE_XFIXER=true  # or false to disable
 ```
 
+### Database Tables
+
+The module creates the following tables:
+
+```sql
+xfixer_excluded_channels (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    guild_id VARCHAR(20) NOT NULL,
+    channel_id VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_guild_channel (guild_id, channel_id)
+)
+
+xfixer_settings (
+    guild_id VARCHAR(20) PRIMARY KEY,
+    delete_original BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)
+```
+
 ### Module States
 
-- **Enabled**: Automatically processes messages
+- **Enabled**: Automatically processes messages (except excluded channels)
+- **Disabled**: No link processing occurs
+
+### Server Settings
+
+- **Delete Original**: Whether to delete the original message after fixing (default: true)
+- **Excluded Channels**: List of channels where link fixing is disabled
 - **Disabled**: No link processing occurs
 
 ## Examples
