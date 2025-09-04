@@ -18,8 +18,12 @@ class Logger {
     }
 
     ensureLogsDirectory() {
-        if (!fs.existsSync(this.logsDir)) {
-            fs.mkdirSync(this.logsDir, { recursive: true });
+        try {
+            if (!fs.existsSync(this.logsDir)) {
+                fs.mkdirSync(this.logsDir, { recursive: true });
+            }
+        } catch (error) {
+            console.error(`Failed to create logs directory: ${error.message}`);
         }
     }
 
@@ -57,9 +61,14 @@ class Logger {
         // Print colored message to console
         console.log(coloredMessage);
 
-        // Write plain message to file
-        const logFile = path.join(this.logsDir, `${new Date().toISOString().split('T')[0]}.log`);
-        fs.appendFileSync(logFile, formattedMessage + '\n');
+        // Write plain message to file with error handling
+        try {
+            const logFile = path.join(this.logsDir, `${new Date().toISOString().split('T')[0]}.log`);
+            fs.appendFileSync(logFile, formattedMessage + '\n');
+        } catch (error) {
+            // If we can't write to file, just continue with console logging
+            console.error(`Failed to write to log file: ${error.message}`);
+        }
     }
 
     info(message) {
