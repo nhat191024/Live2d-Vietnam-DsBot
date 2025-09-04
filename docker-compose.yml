@@ -6,4 +6,4 @@ services:
     container_name: live2d-discord-bot
     restart: unless-stopped
     volumes:
-      - bot-logs:/app/logs
+      - ./logs:/app/logs
