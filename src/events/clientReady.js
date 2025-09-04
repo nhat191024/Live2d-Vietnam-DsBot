@@ -19,7 +19,7 @@ class ClientReadyEvent extends BaseEvent {
         await client.moduleManager.registerSlashCommands();
 
         // Set bot status
-        client.user.setActivity('Discord Bot | /help', { type: ActivityType.Playing });
+        client.user.setActivity('Ping Taiyo nếu bạn muốn thêm tính năng :3', { type: ActivityType.Playing });
 
         Logger.info('-------------------- 🚀 Bot is fully operational and ready to serve! --------------------');
     }
