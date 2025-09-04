@@ -8,7 +8,7 @@ class AutoForumPostModule {
         this.name = 'AutoForumPost';
         this.description = 'Automated forum posting features';
         this.enabled = true;
-        this.version = '1.0.0';
+        this.version = '2.0.0';
     }
 
     async load() {
@@ -21,9 +21,7 @@ class AutoForumPostModule {
             // Register event listener for message creation
             this.client.on('messageCreate', this.handleMessage.bind(this));
 
-            // Note: messageReactionAdd is handled by the event handler in src/events/
-
-            Logger.module(`${this.name} module loaded successfully`);
+            Logger.module(`${this.name} module method loaded successfully`);
         } catch (error) {
             Logger.error(`Failed to load ${this.name} module: ${error.message}`);
             throw error;
@@ -84,7 +82,6 @@ class AutoForumPostModule {
             `;
 
             await Database.execute(settingsQuery);
-            Logger.success('AutoForumPost tables created/verified');
         } catch (error) {
             Logger.error(`Failed to create AutoForumPost tables: ${error.message}`);
             throw error;

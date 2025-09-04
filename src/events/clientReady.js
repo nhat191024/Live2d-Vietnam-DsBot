@@ -21,7 +21,7 @@ class ClientReadyEvent extends BaseEvent {
         // Set bot status
         client.user.setActivity('Discord Bot | /help', { type: ActivityType.Playing });
 
-        Logger.success('🚀 Bot is fully operational and ready to serve!');
+        Logger.info('-------------------- 🚀 Bot is fully operational and ready to serve! --------------------');
     }
 }
 

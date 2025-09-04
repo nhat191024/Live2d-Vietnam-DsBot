@@ -28,8 +28,7 @@ class FunModule {
             // Setup module-specific intervals/timers
             this.setupAutoFeatures();
 
-            Logger.module(`${this.name} module loaded successfully`);
-            Logger.debug(`📚 Loaded ${this.jokes.length} jokes and ${this.facts.length} facts`);
+            Logger.module(`${this.name} module method loaded successfully`);
         } catch (error) {
             Logger.error(`Failed to load ${this.name} module: ${error.message}`);
             throw error;

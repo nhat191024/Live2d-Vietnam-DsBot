@@ -12,7 +12,8 @@ class DiscordBot extends Client {
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.MessageContent,
                 GatewayIntentBits.GuildMembers,
-                GatewayIntentBits.GuildVoiceStates
+                GatewayIntentBits.GuildVoiceStates,
+                GatewayIntentBits.GuildMessageReactions
             ]
         });
 
@@ -51,7 +52,7 @@ class DiscordBot extends Client {
 
             // Login to Discord only if not already logged in
             if (!this.isReady()) {
-                Logger.discord('Connecting to Discord...');
+                Logger.discord('-------------------- Connecting to Discord... --------------------');
                 await this.login(Config.get('token'));
             } else {
                 Logger.discord('Bot is already logged in, skipping login');

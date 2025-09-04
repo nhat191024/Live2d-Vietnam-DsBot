@@ -42,6 +42,7 @@ class ModuleManager {
 
         const moduleFiles = fs.readdirSync(modulesPath);
 
+        Logger.info('-------------------- Start loading modules --------------------');
         for (const moduleFile of moduleFiles) {
             if (!moduleFile.endsWith('.js')) continue;
 
@@ -78,6 +79,7 @@ class ModuleManager {
             return;
         }
 
+        Logger.info('-------------------- Start loading commands --------------------');
         await this.loadCommandsFromDirectory(commandsPath);
     }
 
@@ -125,6 +127,7 @@ class ModuleManager {
 
         const eventFiles = fs.readdirSync(eventsPath);
 
+        Logger.info('-------------------- Start loading events --------------------');
         for (const eventFile of eventFiles) {
             if (!eventFile.endsWith('.js')) continue;
 
@@ -170,7 +173,7 @@ class ModuleManager {
         for (const command of this.commands.values()) {
             commands.push(command.getSlashCommandData().toJSON());
         }
-
+        Logger.info('-------------------- Start loading slash commands --------------------');
         Logger.loading(`Registering ${commands.length} slash commands...`);
 
         const rest = new REST().setToken(Config.get('token'));

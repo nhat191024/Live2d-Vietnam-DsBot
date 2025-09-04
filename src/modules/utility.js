@@ -13,8 +13,7 @@ class UtilityModule {
 
         // Initialize module-specific features here
         // For example: database connections, external APIs, etc.
-
-        Logger.module(`${this.name} module loaded successfully`);
+        Logger.module(`${this.name} module method loaded successfully`);
     }
 
     async unload() {

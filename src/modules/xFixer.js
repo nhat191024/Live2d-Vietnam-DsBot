@@ -21,7 +21,7 @@ class XFixerModule {
             // Register event listener for message creation
             this.client.on('messageCreate', this.handleMessage.bind(this));
 
-            Logger.module(`${this.name} module loaded successfully`);
+            Logger.module(`${this.name} module method loaded successfully`);
         } catch (error) {
             Logger.error(`Failed to load ${this.name} module: ${error.message}`);
             throw error;
@@ -63,7 +63,6 @@ class XFixerModule {
             `;
 
             await Database.execute(settingsQuery);
-            Logger.success('XFixer tables created/verified');
         } catch (error) {
             Logger.error(`Failed to create XFixer tables: ${error.message}`);
             throw error;
