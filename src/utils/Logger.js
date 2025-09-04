@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const color = require('color');
 
 class Logger {
     constructor() {
@@ -31,9 +30,6 @@ class Logger {
 
     formatColoredMessage(level, message) {
         const timestamp = new Date().toISOString();
-        // const timestampColored = color(this.colors.timestamp).hex();
-        const levelColor = this.colors[level] || this.colors.info;
-        // const levelColored = color(levelColor).hex();
 
         // ANSI color codes for terminal
         const timestampAnsi = `\x1b[90m[${timestamp}]\x1b[0m`; // Gray
