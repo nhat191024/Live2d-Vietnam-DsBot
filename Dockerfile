@@ -16,17 +16,17 @@ RUN pnpm install --frozen-lockfile --prod
 # Copy the rest of the application code
 COPY . .
 
-# Create logs directory
-RUN mkdir -p logs
-
 # Create a non-root user for security
 RUN groupadd -r botuser && useradd -r -g botuser botuser
 
-# Change ownership of the app directory to the new user
-RUN chown -R botuser:botuser /app
+# Create logs directory and set proper permissions
+RUN mkdir -p logs && chown -R botuser:botuser /app && chmod -R 755 /app/logs
 
 # Switch to the non-root user
 USER botuser
+
+# Verify permissions (optional, for debugging)
+RUN ls -la logs/
 
 # Start the application
 CMD ["pnpm", "start"]
