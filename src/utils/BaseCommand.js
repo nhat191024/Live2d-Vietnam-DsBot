@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, InteractionType } = require('discord.js');
+const Config = require('../utils/Config');
 
 class BaseCommand {
     constructor(options = {}) {
@@ -59,10 +60,12 @@ class BaseCommand {
 
     // Helper methods to detect command type
     isSlashCommand(interaction) {
+        if (typeof interaction.isCommand !== 'function') return false;
         return interaction.isCommand();
     }
 
     isPrefixCommand(interaction) {
+        if (typeof interaction.isCommand !== 'function') return true;
         return !interaction.isCommand();
     }
 
