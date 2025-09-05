@@ -59,11 +59,11 @@ class BaseCommand {
 
     // Helper methods to detect command type
     isSlashCommand(interaction) {
-        return interaction.isSlashCommand && interaction.isSlashCommand();
+        return interaction.isCommand();
     }
 
     isPrefixCommand(interaction) {
-        return interaction.isPrefixCommand && interaction.isPrefixCommand();
+        return !interaction.isCommand();
     }
 
     // Get prefix command usage (override in commands that need custom usage)
