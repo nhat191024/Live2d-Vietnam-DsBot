@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const BaseCommand = require('../utils/BaseCommand');
+const BaseCommand = require('../../utils/BaseCommand');
 
 class HelpCommand extends BaseCommand {
     constructor() {
@@ -49,7 +49,7 @@ class HelpCommand extends BaseCommand {
 
             // Add usage information based on command type
             if (this.isPrefixCommand(interaction)) {
-                const prefix = require('../utils/Config').get('prefix');
+                const prefix = require('../../utils/Config').get('prefix');
                 embed.addFields({ name: 'Cách dùng với tiền tố', value: `\`${prefix}${command.getPrefixUsage()}\`` });
             } else {
                 embed.addFields({ name: 'Cách dùng với Slash', value: `\`/${command.name}\`` });
@@ -82,7 +82,7 @@ class HelpCommand extends BaseCommand {
 
             // Add footer based on command type
             if (this.isPrefixCommand(interaction)) {
-                const prefix = require('../utils/Config').get('prefix');
+                const prefix = require('../../utils/Config').get('prefix');
                 embed.setFooter({ text: `Dùng ${prefix}help <lệnh> để xem chi tiết | Tiền tố hiện tại: ${prefix}` });
             } else {
                 embed.setFooter({ text: 'Dùng /help <lệnh> để xem chi tiết về một lệnh' });

@@ -1,5 +1,5 @@
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
-const BaseCommand = require('../utils/BaseCommand');
+const BaseCommand = require('../../../utils/BaseCommand');
 
 class ModuleCommand extends BaseCommand {
     constructor() {

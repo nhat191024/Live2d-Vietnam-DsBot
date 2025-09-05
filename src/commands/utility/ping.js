@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const BaseCommand = require('../utils/BaseCommand');
+const BaseCommand = require('../../utils/BaseCommand');
 
 class PingCommand extends BaseCommand {
     constructor() {

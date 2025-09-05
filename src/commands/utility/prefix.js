@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
-const BaseCommand = require('../utils/BaseCommand');
-const Config = require('../utils/Config');
+const BaseCommand = require('../../utils/BaseCommand');
+const Config = require('../../utils/Config');
 
 class PrefixCommand extends BaseCommand {
     constructor() {
