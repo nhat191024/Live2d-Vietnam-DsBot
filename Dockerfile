@@ -13,9 +13,6 @@ COPY package.json pnpm-lock.yaml ./
 # Install dependencies
 RUN pnpm install --frozen-lockfile --prod
 
-# Copy the rest of the application code
-COPY . .
-
 # Create a non-root user and group
 RUN groupadd -r botuser && useradd -r -g botuser botuser
 

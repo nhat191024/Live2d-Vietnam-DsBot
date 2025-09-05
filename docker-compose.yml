@@ -7,3 +7,5 @@ services:
     restart: unless-stopped
     volumes:
       - ./logs:/app/logs
+      - .:/app
+      - /app/node_modules
