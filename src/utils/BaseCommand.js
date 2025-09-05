@@ -73,6 +73,10 @@ class BaseCommand {
     getPrefixUsage() {
         return `${this.name}`;
     }
+
+    getPrefix() {
+        return Config.getPrefix();
+    }
 }
 
 module.exports = BaseCommand;
