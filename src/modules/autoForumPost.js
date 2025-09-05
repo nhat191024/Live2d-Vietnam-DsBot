@@ -167,7 +167,6 @@ class AutoForumPostModule {
                     // Send message to the thread
                     const sentMessage = await targetThread.send({
                         content: `💬 **Từ ${message.author}:**\n\n${fixedContent}`,
-                        embeds: message.embeds,
                         files: Array.from(message.attachments.values())
                     });
 
