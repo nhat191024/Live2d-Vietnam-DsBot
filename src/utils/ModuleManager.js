@@ -12,7 +12,7 @@ class ModuleManager {
         this.cooldowns = new Map();
 
         // Core modules that should always be enabled
-        this.coreModules = ['core', 'utility'];
+        this.coreModules = ['core'];
     }
 
     // Cleanup existing handlers before loading new ones
