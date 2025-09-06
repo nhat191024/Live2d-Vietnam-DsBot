@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "modules": "node tools/module-cli.js",
+    "module:list": "node -e \"const config = require('./config/modules.json'); console.log('📋 Modules:', Object.keys(config.modules).join(', '));\""
   },
   "keywords": [
     "discord",
