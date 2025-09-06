@@ -7,7 +7,8 @@ class FilterSettingsCommand extends BaseCommand {
         this.name = 'autoforumpost_filter_settings';
         this.description = 'Manage content filtering settings for AutoForumPost';
         this.category = 'AutoForumPost';
-        this.cooldown = 3000;
+        this.module = 'autoForumPost';
+        this.cooldown = 5;
         this.permissions = [PermissionFlagsBits.ManageChannels];
     }
 

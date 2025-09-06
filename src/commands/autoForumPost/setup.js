@@ -6,8 +6,8 @@ class SetupCommand extends BaseCommand {
         super();
         this.name = 'autoforumpost_setup';
         this.description = 'Setup automatic forum posting for a channel';
-        this.category = 'AutoForumPost';
-        this.cooldown = 0;
+        this.module = 'autoForumPost';
+        this.cooldown = 5;
         this.permissions = [PermissionFlagsBits.ManageChannels];
     }
 

@@ -6,8 +6,8 @@ class RemoveCommand extends BaseCommand {
         super();
         this.name = 'autoforumpost_remove';
         this.description = 'Remove automatic forum posting for a channel';
-        this.category = 'AutoForumPost';
-        this.cooldown = 3000;
+        this.module = 'autoForumPost';
+        this.cooldown = 5;
         this.permissions = [PermissionFlagsBits.ManageChannels];
     }
 
