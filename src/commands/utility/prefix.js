@@ -8,7 +8,7 @@ class PrefixCommand extends BaseCommand {
             name: 'prefix',
             description: 'Show current prefix or test prefix commands',
             category: 'utility',
-            module: 'utility'
+            module: 'core'
         });
     }
 

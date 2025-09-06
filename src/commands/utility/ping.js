@@ -7,7 +7,7 @@ class PingCommand extends BaseCommand {
             name: 'ping',
             description: 'Check bot latency',
             category: 'utility',
-            module: 'utility'
+            module: 'core'
         });
     }
 

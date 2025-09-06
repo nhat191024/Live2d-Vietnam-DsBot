@@ -7,7 +7,7 @@ class HelpCommand extends BaseCommand {
             name: 'help',
             description: 'Display help information',
             category: 'utility',
-            module: 'utility'
+            module: 'core'
         });
     }
 
