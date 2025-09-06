@@ -7,7 +7,8 @@ class SettingsCommand extends BaseCommand {
         this.name = 'xfixer_settings';
         this.description = 'Manage XFixer settings for this server';
         this.category = 'XFixer';
-        this.cooldown = 3000;
+        this.module = 'xFixer';
+        this.cooldown = 30;
         this.permissions = [PermissionFlagsBits.ManageChannels];
     }
 

@@ -7,7 +7,8 @@ class ListCommand extends BaseCommand {
         this.name = 'xfixer_list';
         this.description = 'List all channels excluded from X link fixing';
         this.category = 'XFixer';
-        this.cooldown = 3000;
+        this.module = 'xFixer';
+        this.cooldown = 30;
         this.permissions = [PermissionFlagsBits.ManageChannels];
     }
 

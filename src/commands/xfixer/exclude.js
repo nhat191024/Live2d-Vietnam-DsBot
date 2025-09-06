@@ -7,7 +7,8 @@ class ExcludeCommand extends BaseCommand {
         this.name = 'xfixer_exclude';
         this.description = 'Exclude a channel from X link fixing';
         this.category = 'XFixer';
-        this.cooldown = 0;
+        this.module = 'xFixer';
+        this.cooldown = 30;
         this.permissions = [PermissionFlagsBits.ManageChannels];
     }
 

@@ -7,7 +7,8 @@ class IncludeCommand extends BaseCommand {
         this.name = 'xfixer_include';
         this.description = 'Include a channel back in X link fixing';
         this.category = 'XFixer';
-        this.cooldown = 3000;
+        this.module = 'xFixer';
+        this.cooldown = 30;
         this.permissions = [PermissionFlagsBits.ManageChannels];
     }
 
