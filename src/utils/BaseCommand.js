@@ -75,7 +75,7 @@ class BaseCommand {
     }
 
     getPrefix() {
-        return Config.getPrefix();
+        return Config.get('prefix');
     }
 }
 
