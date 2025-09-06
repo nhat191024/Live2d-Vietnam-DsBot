@@ -6,6 +6,7 @@ class ListCommand extends BaseCommand {
         super();
         this.name = 'autoforumpost_list';
         this.description = 'List all auto forum posting setups in this server';
+        this.category = 'AutoForumPost';
         this.module = 'autoForumPost';
         this.cooldown = 5;
         this.permissions = [PermissionFlagsBits.ManageChannels];
