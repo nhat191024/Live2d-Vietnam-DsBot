@@ -7,6 +7,7 @@ class UtilityModule {
         this.name = 'utility';
         this.description = 'Basic utility commands and features';
         this.enabled = true;
+        this.version = '1.0.0';
     }
 
     async load() {
