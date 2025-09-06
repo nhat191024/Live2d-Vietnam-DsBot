@@ -96,7 +96,6 @@ class Config {
                 enabled = process.env[envKey] !== 'false';
             }
 
-            console.log(`ModuleManager - state load: '${moduleName}' is ${enabled}`);
             this.moduleStates.set(moduleName, enabled);
         }
 
