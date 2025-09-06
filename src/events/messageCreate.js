@@ -109,7 +109,7 @@ class MessageCreateEvent extends BaseEvent {
 
             // Simple options system for prefix commands
             options: {
-                getString: (name) => args[0] || null,
+                getString: (name) => args.length ? args.join(' ') : null,
                 getInteger: (name) => {
                     const value = parseInt(args[0]);
                     return isNaN(value) ? null : value;
