@@ -103,7 +103,7 @@ class ModuleManager {
                     }
 
                     if (!this.isModuleEnabled(commandInstance.module)) {
-                        Logger.info(`Command ${commandInstance.name} belongs to disabled module ${commandInstance.module}, skipping...`);
+                        // Logger.info(`Command ${commandInstance.name} belongs to disabled module ${commandInstance.module}, skipping...`);
                         continue;
                     }
 
