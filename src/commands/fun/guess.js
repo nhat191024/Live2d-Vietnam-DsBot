@@ -59,6 +59,7 @@ class NumberGuessCommand extends BaseCommand {
                         'Mỗi lần đoán, bot sẽ cho bạn biết số của bạn lớn hơn hay nhỏ hơn số bí mật.',
                         'Hãy cố gắng đoán đúng trong số lượt cho phép!',
                         '',
+                        'Cách chơi: !guess [max] (max là số lớn nhất, mặc định 10) hoặc dùng lệnh /guess với tùy chọn max.',
                         '**Lưu ý:**',
                         '- Nếu khoảng số lớn hơn 20, bạn sẽ cần nhập số đoán bằng tay thay vì dùng nút bấm.',
                         '- Nếu MaxNumber ≤ 10: Điểm số sẽ giảm còn (50% điểm).',
