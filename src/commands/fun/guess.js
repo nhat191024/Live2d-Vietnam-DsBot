@@ -20,6 +20,11 @@ class NumberGuessCommand extends BaseCommand {
                     .setRequired(false)
                     .setMinValue(10)
                     .setMaxValue(100)
+            )
+            .addStringOption(option =>
+                option.setName('rule')
+                    .setDescription('Hiển thị luật chơi')
+                    .setRequired(false)
             );
     }
 
@@ -43,6 +48,27 @@ class NumberGuessCommand extends BaseCommand {
             return;
         }
 
+        // If 'rule' option is provided, show the rules
+        if (interaction.options.getString('rule')) {
+            const rulesEmbed = new EmbedBuilder()
+                .setColor('#0099ff')
+                .setTitle('📜 Luật chơi đoán số')
+                .setDescription(
+                    [
+                        'Bạn sẽ có một số lượt đoán để tìm ra số bí mật trong khoảng từ 1 đến {maxNumber}.',
+                        'Mỗi lần đoán, bot sẽ cho bạn biết số của bạn lớn hơn hay nhỏ hơn số bí mật.',
+                        'Hãy cố gắng đoán đúng trong số lượt cho phép!',
+                        '',
+                        '**Lưu ý:**',
+                        '- Nếu khoảng số lớn hơn 20, bạn sẽ cần nhập số đoán bằng tay thay vì dùng nút bấm.',
+                        '- Nếu MaxNumber ≤ 10: Điểm số sẽ giảm còn (50% điểm).',
+                        '- Nếu MaxNumber ≤ 20: Điểm số sẽ giảm còn (70% điểm).',
+                        '- Nếu MaxNumber > 20: Bạn sẽ nhận được điểm đầy đủ.'
+                    ].join('\n')
+                );
+            await interaction.reply({ embeds: [rulesEmbed], ephemeral: true });
+            return;
+        }
         const maxNumber = interaction.options.getInteger('max') || 10;
         const secretNumber = Math.floor(Math.random() * maxNumber) + 1;
         const maxAttempts = Math.ceil(maxNumber / 3);
@@ -153,10 +179,12 @@ class NumberGuessCommand extends BaseCommand {
         if (guess === secretNumber) {
             // Correct guess!
             let score = Math.max(100 - (game.attempts - 1) * 10, 10);
-            if (maxNumber <= 15) {
+            if (maxNumber <= 10) {
                 score = Math.floor(score * 0.5);
             } else if (maxNumber <= 20) {
                 score = Math.floor(score * 0.7);
+            } else {
+                score = Math.floor(score * 1);
             }
             const duration = Math.floor((Date.now() - game.startTime) / 1000);
 
