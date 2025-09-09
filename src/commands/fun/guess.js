@@ -48,8 +48,10 @@ class NumberGuessCommand extends BaseCommand {
             return;
         }
 
+        console.log(interaction.options.getString('rule'));
+
         // If 'rule' option is provided, show the rules
-        if (interaction.options.getString('rule')) {
+        if (interaction.options.getString('rule') === 'rule' || interaction.options.getString('rule') === 'true') {
             const rulesEmbed = new EmbedBuilder()
                 .setColor('#0099ff')
                 .setTitle('📜 Luật chơi đoán số')
@@ -71,9 +73,18 @@ class NumberGuessCommand extends BaseCommand {
             await interaction.reply({ embeds: [rulesEmbed], ephemeral: true });
             return;
         }
+
         const maxNumber = interaction.options.getInteger('max') || 10;
         const secretNumber = Math.floor(Math.random() * maxNumber) + 1;
         const maxAttempts = Math.ceil(maxNumber / 3);
+
+        if (maxNumber < 10 || maxNumber > 100) {
+            await interaction.reply({
+                content: 'Vui lòng chọn số lớn nhất trong khoảng từ 10 đến 100.',
+                ephemeral: true
+            });
+            return;
+        }
 
         // Start the game
         funModule.startGame(interaction.channelId, 'number_guess', {
