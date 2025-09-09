@@ -18,8 +18,8 @@ class NumberGuessCommand extends BaseCommand {
                 option.setName('max')
                     .setDescription('Maximum number to guess (default: 10)')
                     .setRequired(false)
-                    .setMinValue(5)
-                    .setMaxValue(100)
+                    .setMinValue(10)
+                    .setMaxValue(20)
             );
     }
 
@@ -45,7 +45,15 @@ class NumberGuessCommand extends BaseCommand {
 
         const maxNumber = interaction.options.getInteger('max') || 10;
         const secretNumber = Math.floor(Math.random() * maxNumber) + 1;
-        const maxAttempts = Math.ceil(Math.log2(maxNumber)) + 2; // Fair number of attempts
+        const maxAttempts = Math.ceil(Math.log2(maxNumber)); // Fair number of attempts
+
+        if (maxNumber > 20 || maxNumber < 10) {
+            await interaction.reply({
+                content: 'Please choose a number between 10 and 20 for a better experience.',
+                ephemeral: true
+            });
+            return;
+        }
 
         // Start the game
         funModule.startGame(interaction.channelId, 'number_guess', {
@@ -198,13 +206,14 @@ class NumberGuessCommand extends BaseCommand {
             gameEnded = true;
         } else {
             // Wrong guess, give hint
-            const hint = guess < secretNumber ? 'higher' : 'lower';
+            const hint = guess > secretNumber ? 'high' : 'low';
+            const hint2 = guess < secretNumber ? 'higher' : 'lower';
             const attemptsLeft = maxAttempts - game.attempts;
 
             resultEmbed = new EmbedBuilder()
                 .setColor('#FFA500')
                 .setTitle('🤔 Try Again!')
-                .setDescription(`**${guess}** is too ${hint}! Try a ${hint} number.`)
+                .setDescription(`**${guess}** is too ${hint}! Try a ${hint2} number.`)
                 .addFields(
                     { name: 'Attempts left', value: `${attemptsLeft}`, inline: true },
                     { name: 'Range', value: `1 - ${maxNumber}`, inline: true }
