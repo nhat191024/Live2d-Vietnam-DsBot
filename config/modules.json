@@ -29,6 +29,14 @@
             "dependencies": [
                 "Database"
             ]
+        },
+        "voiceLogger": {
+            "enabled": true,
+            "description": "Voice channel activity logging and statistics",
+            "category": "Moderation",
+            "dependencies": [
+                "Database"
+            ]
         }
     },
     "settings": {
