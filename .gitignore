@@ -31,6 +31,7 @@ docs/AI_AGENT_GUIDE.md
 #gonna add this back in the future
 docs/DEVELOPER_GUIDE.md
 CHANGELOG.md
+docs/VOICELOGGER_MODULE.md
 
 #test command work in progress
 /src/commands/database.js
