@@ -1,24 +1,27 @@
+# Use the official Node.js 18 LTS image based on Debian
 FROM node:18-bullseye-slim
 
+# Set the working directory inside the container
 WORKDIR /app
 
+# Install pnpm globally
 RUN npm install -g pnpm@10.12.4
 
+# Copy package.json and pnpm-lock.yaml for caching
 COPY package.json pnpm-lock.yaml ./
 
-# Tạo user với UID cụ thể (thường là 1000 cho user đầu tiên trên Linux)
-RUN groupadd -g 1000 botuser && \
-    useradd -u 1000 -g botuser -m botuser
-
-# Cấp quyền cho user botuser vào thư mục app
-RUN chown -R botuser:botuser /app
-
+# Install dependencies
 RUN pnpm install --frozen-lockfile --prod
 
-# Copy toàn bộ code vào (nếu không dùng volume mount toàn bộ folder)
-COPY . .
-RUN chown -R botuser:botuser /app
+# Create a non-root user and group
+RUN groupadd -r botuser && useradd -r -g botuser botuser
 
-USER botuser
+# Copy entrypoint script
+COPY entrypoint.sh ./
+RUN chmod +x entrypoint.sh
 
+# Set the entrypoint
+ENTRYPOINT ["/bin/bash", "./entrypoint.sh"]
+
+# Start the application
 CMD ["pnpm", "start"]
