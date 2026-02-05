@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: live2d-discord-bot:latest
     container_name: live2d-discord-bot
     restart: unless-stopped
     volumes:
