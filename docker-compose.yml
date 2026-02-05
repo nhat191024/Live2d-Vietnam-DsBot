@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: live2d-discord-bot
+    user: "1000:1000"
     restart: unless-stopped
     volumes:
       - ./logs:/app/logs
