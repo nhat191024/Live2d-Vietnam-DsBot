@@ -2,12 +2,12 @@
 NODE_ENV = "production"
 
 [phases.setup]
-nixPkgs = ["nodejs_18"]
+nixPkgs = ["nodejs_22"]
 
 [phases.install]
 cmds = [
   "corepack enable",
-  "corepack prepare pnpm@latest --activate",
+  "corepack prepare pnpm@11.15.1 --activate",
   "pnpm install --frozen-lockfile --prod"
 ]
 

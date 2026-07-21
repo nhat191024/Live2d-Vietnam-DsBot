@@ -10,7 +10,8 @@ Một đống thứ random sht
 
 ### Yêu cầu
 
-- Node.js 16+
+- Node.js 22+
+- pnpm 11
 - MySQL Server 8.0+
 - Discord Bot Token
 

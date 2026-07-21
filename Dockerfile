@@ -1,11 +1,11 @@
-# Use the official Node.js 18 LTS image based on Debian
-FROM node:18-bullseye-slim
+# pnpm 11 requires Node.js 22 or newer
+FROM node:22-bookworm-slim
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Install pnpm globally
-RUN npm install -g pnpm@10.12.4
+RUN npm install -g pnpm@11.15.1
 
 # Copy package.json and pnpm-lock.yaml for caching
 COPY package.json pnpm-lock.yaml ./
