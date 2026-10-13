@@ -6,17 +6,30 @@ class ScamTrap {
         this.client = client;
         this.timer = null;
         this.pending = new Set();
+        this.recentMessages = new Map();
         this.onMessage = this.handleMessage.bind(this);
     }
 
     async load() {
         await Database.execute(`CREATE TABLE IF NOT EXISTS scam_trap_settings (
             guild_id VARCHAR(20) PRIMARY KEY,
-            trap_channel_id VARCHAR(20) NOT NULL,
+            trap_channel_id VARCHAR(20) NULL,
             alert_channel_id VARCHAR(20) NULL,
             ban_minutes INT NOT NULL DEFAULT 60,
-            enabled BOOLEAN NOT NULL DEFAULT TRUE
+            enabled BOOLEAN NOT NULL DEFAULT TRUE,
+            trap_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+            spam_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+            spam_channel_count INT NOT NULL DEFAULT 5,
+            spam_window_seconds INT NOT NULL DEFAULT 5
         )`);
+        const columns = await Database.execute(`SELECT COLUMN_NAME FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'scam_trap_settings'`);
+        const names = new Set(columns.map(column => column.COLUMN_NAME));
+        if (!names.has('trap_enabled')) await Database.execute('ALTER TABLE scam_trap_settings ADD COLUMN trap_enabled BOOLEAN NOT NULL DEFAULT TRUE');
+        if (!names.has('spam_enabled')) await Database.execute('ALTER TABLE scam_trap_settings ADD COLUMN spam_enabled BOOLEAN NOT NULL DEFAULT TRUE');
+        if (!names.has('spam_channel_count')) await Database.execute('ALTER TABLE scam_trap_settings ADD COLUMN spam_channel_count INT NOT NULL DEFAULT 5');
+        if (!names.has('spam_window_seconds')) await Database.execute('ALTER TABLE scam_trap_settings ADD COLUMN spam_window_seconds INT NOT NULL DEFAULT 5');
+        await Database.execute('ALTER TABLE scam_trap_settings MODIFY COLUMN trap_channel_id VARCHAR(20) NULL');
         await Database.execute(`CREATE TABLE IF NOT EXISTS scam_trap_bans (
             guild_id VARCHAR(20) NOT NULL,
             user_id VARCHAR(20) NOT NULL,
@@ -24,7 +37,10 @@ class ScamTrap {
             PRIMARY KEY (guild_id, user_id),
             INDEX idx_expires_at (expires_at)
         )`);
-        this.timer = setInterval(() => this.releaseExpired().catch(error => Logger.error(`Scam trap release: ${error.message}`)), 30000);
+        this.timer = setInterval(() => {
+            this.releaseExpired().catch(error => Logger.error(`Scam trap release: ${error.message}`));
+            this.pruneRecentMessages(Date.now());
+        }, 30000);
         this.timer.unref?.();
         this.client.on('messageCreate', this.onMessage);
     }
@@ -33,6 +49,7 @@ class ScamTrap {
         if (this.timer) clearInterval(this.timer);
         this.timer = null;
         this.client.off('messageCreate', this.onMessage);
+        this.recentMessages.clear();
     }
 
     async getSettings(guildId) {
@@ -41,34 +58,64 @@ class ScamTrap {
     }
 
     async configure(guildId, trapId, alertId, minutes) {
-        await Database.execute(`INSERT INTO scam_trap_settings (guild_id, trap_channel_id, alert_channel_id, ban_minutes, enabled)
-            VALUES (?, ?, ?, ?, TRUE) ON DUPLICATE KEY UPDATE trap_channel_id = VALUES(trap_channel_id),
-            alert_channel_id = VALUES(alert_channel_id), ban_minutes = VALUES(ban_minutes), enabled = TRUE`,
-        [guildId, trapId, alertId, minutes]);
+        await this.updateSettings(guildId, {
+            trap_channel_id: trapId, alert_channel_id: alertId, ban_minutes: minutes,
+            enabled: true, trap_enabled: true, spam_enabled: true
+        });
+    }
+
+    async updateSettings(guildId, updates) {
+        const allowed = new Set(['trap_channel_id', 'alert_channel_id', 'ban_minutes', 'enabled',
+            'trap_enabled', 'spam_enabled', 'spam_channel_count', 'spam_window_seconds']);
+        const entries = Object.entries(updates);
+        if (!entries.length || entries.some(([name]) => !allowed.has(name))) throw new Error('Invalid scam trap setting');
+        await Database.execute(`INSERT IGNORE INTO scam_trap_settings
+            (guild_id, enabled, trap_enabled, spam_enabled) VALUES (?, FALSE, FALSE, FALSE)`, [guildId]);
+        await Database.execute(`UPDATE scam_trap_settings SET ${entries.map(([name]) => `${name} = ?`).join(', ')} WHERE guild_id = ?`,
+            [...entries.map(([, value]) => value), guildId]);
+        if (updates.enabled === false || updates.spam_enabled !== undefined ||
+            updates.spam_window_seconds !== undefined || updates.spam_channel_count !== undefined) {
+            this.clearRecentMessages(guildId);
+        }
+    }
+
+    clearRecentMessages(guildId) {
+        for (const key of this.recentMessages.keys()) {
+            if (key.startsWith(`${guildId}:`)) this.recentMessages.delete(key);
+        }
     }
 
     async setEnabled(guildId, enabled) {
-        await Database.execute('UPDATE scam_trap_settings SET enabled = ? WHERE guild_id = ?', [enabled, guildId]);
+        await this.updateSettings(guildId, { enabled });
     }
 
     async handleMessage(message) {
         if (!message.guild || message.author.id === this.client.user.id ||
             !this.client.moduleManager.isModuleEnabled('scamTrap')) return;
         const settings = await this.getSettings(message.guild.id);
-        if (!settings?.enabled || message.channelId !== settings.trap_channel_id) return;
+        if (!settings?.enabled) return;
 
-        // Prevent duplicate moderation if multiple messages arrive together.
+        const inTrap = !!settings.trap_enabled && message.channelId === settings.trap_channel_id;
         const key = `${message.guild.id}:${message.author.id}`;
         if (this.pending.has(key)) {
             await message.delete().catch(error => Logger.warn(`Scam trap delete failed: ${error.message}`));
             return;
         }
+        if (!inTrap && (!settings.spam_enabled || message.author.bot)) return;
+
+        const recent = inTrap ? [] : this.recordMessage(key, message, settings.spam_window_seconds);
+        const channels = new Set(recent.map(item => item.channelId));
+        if (!inTrap && channels.size < settings.spam_channel_count) return;
+
         this.pending.add(key);
+        this.recentMessages.delete(key);
         try {
-            const deleted = await message.delete().then(() => true).catch(error => {
-                Logger.warn(`Scam trap delete failed: ${error.message}`);
-                return false;
-            });
+            const messages = inTrap ? [message] : recent.map(item => item.message);
+            const deletion = await Promise.allSettled(messages.map(item => item.delete()));
+            const deleted = deletion.filter(result => result.status === 'fulfilled').length;
+            for (const result of deletion) {
+                if (result.status === 'rejected') Logger.warn(`Scam trap delete failed: ${result.reason?.message || result.reason}`);
+            }
 
             let banned = false;
             let detail = '';
@@ -82,7 +129,9 @@ class ScamTrap {
                 } else {
                     const member = message.member || await message.guild.members.fetch(message.author.id);
                     if (!member.bannable) throw new Error('Bot không thể ban thành viên này (quyền hoặc role hierarchy).');
-                    await message.guild.members.ban(message.author.id, { reason: `Scam trap: sent a message in ${message.channel.name}` });
+                    await message.guild.members.ban(message.author.id, { reason: inTrap
+                        ? `Scam trap: sent a message in ${message.channel.name}`
+                        : `Scam trap: sent messages in ${settings.spam_channel_count} channels within ${settings.spam_window_seconds} seconds` });
                     banned = true;
                     try {
                         await Database.execute(`INSERT INTO scam_trap_bans (guild_id, user_id, expires_at)
@@ -104,7 +153,7 @@ class ScamTrap {
                 try {
                     const channel = await message.guild.channels.fetch(settings.alert_channel_id);
                     await channel.send({
-                        content: `🚨 Kênh bẫy ${message.channel}: <@${message.author.id}> (${message.author.id}) đã gửi tin nhắn. Xóa: ${deleted ? 'thành công' : 'thất bại'}. Ban tạm: ${banned ? `${settings.ban_minutes} phút` : detail || 'không thực hiện'}.`,
+                        content: `🚨 ${inTrap ? `Kênh bẫy ${message.channel}` : `Spam ${channels.size} kênh trong ${settings.spam_window_seconds} giây (${[...channels].map(id => `<#${id}>`).join(', ')})`}: <@${message.author.id}> (${message.author.id}). Xóa: ${deleted}/${messages.length} tin. Ban tạm: ${banned ? `${settings.ban_minutes} phút` : detail || 'không thực hiện'}.`,
                         allowedMentions: { parse: [] }
                     });
                 } catch (error) {
@@ -113,6 +162,30 @@ class ScamTrap {
             }
         } finally {
             this.pending.delete(key);
+        }
+    }
+
+    recordMessage(key, message, windowSeconds = 5) {
+        const now = message.createdTimestamp || Date.now();
+        const recent = this.recentMessages.get(key) || [];
+        recent.push({ message, channelId: message.channelId, timestamp: now });
+        const latest = Math.max(...recent.map(item => item.timestamp));
+        const active = recent.filter(item => latest - item.timestamp <= windowSeconds * 1000);
+        // Bound memory while retaining at least one message from each channel.
+        while (active.length > 100) {
+            const duplicate = active.findIndex((item, index) =>
+                active.some((other, otherIndex) => otherIndex > index && other.channelId === item.channelId));
+            active.splice(duplicate >= 0 ? duplicate : 0, 1);
+        }
+        this.recentMessages.set(key, active);
+        return active;
+    }
+
+    pruneRecentMessages(now) {
+        for (const [key, messages] of this.recentMessages) {
+            const recent = messages.filter(item => now - item.timestamp <= 60000);
+            if (recent.length) this.recentMessages.set(key, recent);
+            else this.recentMessages.delete(key);
         }
     }
 
