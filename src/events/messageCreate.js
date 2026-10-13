@@ -41,7 +41,7 @@ class MessageCreateEvent extends BaseEvent {
         }
 
         // Check permissions (for guild messages)
-        if (message.guild && !command.hasPermissions(message.member)) {
+        if (message.guild && !command.hasPermissions(message.member, message.author.id)) {
             await message.reply('Bạn không có quyền sử dụng lệnh này!');
             return;
         }

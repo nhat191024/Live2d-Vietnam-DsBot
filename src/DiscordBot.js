@@ -90,7 +90,7 @@ class DiscordBot extends Client {
         }
 
         // Check permissions
-        if (interaction.guild && !command.hasPermissions(interaction.member)) {
+        if (interaction.guild && !command.hasPermissions(interaction.member, interaction.user.id)) {
             await interaction.reply({ content: 'You don\'t have permission to use this command!', ephemeral: true });
             return;
         }

@@ -171,7 +171,11 @@ class ModuleManager {
         const commands = [];
 
         for (const command of this.commands.values()) {
-            commands.push(command.getSlashCommandData().toJSON());
+            const data = command.getSlashCommandData().toJSON();
+            // Discord's default member permissions are checked before the bot receives
+            // an interaction. Commands with developer bypass use our runtime check instead.
+            if (command.developerBypass) delete data.default_member_permissions;
+            commands.push(data);
         }
         Logger.info('-------------------- Start loading slash commands --------------------');
         Logger.loading(`Registering ${commands.length} slash commands...`);

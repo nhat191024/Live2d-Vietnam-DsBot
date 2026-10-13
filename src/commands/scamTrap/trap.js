@@ -9,7 +9,8 @@ class TrapCommand extends BaseCommand {
             category: 'Moderation',
             module: 'scamTrap',
             permissions: [PermissionFlagsBits.Administrator],
-            guildOnly: true
+            guildOnly: true,
+            developerBypass: true
         });
     }
 

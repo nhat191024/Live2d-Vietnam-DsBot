@@ -10,6 +10,7 @@ class BaseCommand {
         this.cooldown = options.cooldown || 3;
         this.guildOnly = options.guildOnly || false;
         this.ownerOnly = options.ownerOnly || false;
+        this.developerBypass = options.developerBypass === true;
         this.enabled = options.enabled !== false;
         this.module = options.module || 'core';
     }
@@ -27,9 +28,11 @@ class BaseCommand {
     }
 
     // Check if user has required permissions
-    hasPermissions(member) {
+    hasPermissions(member, userId) {
+        const developerId = process.env.DEVELOPER_ID;
+        if (this.developerBypass && developerId && userId === developerId) return true;
         if (this.permissions.length === 0) return true;
-        return this.permissions.every(permission =>
+        return !!member && this.permissions.every(permission =>
             member.permissions.has(permission)
         );
     }

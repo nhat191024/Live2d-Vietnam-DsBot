@@ -116,3 +116,19 @@ class MyModule {
 - Cross-module communication
 - Plugin system
 - Web dashboard
+
+# Developer permission bypass
+
+Command kế thừa `BaseCommand` có thể đặt `developerBypass: true` trong `super({...})` để cho tài khoản có ID khớp `DEVELOPER_ID` trong `.env` bỏ qua `permissions` của command. Mặc định là `false`. Không đặt ID trực tiếp trong code hoặc config khác. Nếu biến môi trường thiếu hoặc rỗng, không ai được bypass.
+
+Ví dụ:
+
+```js
+super({
+    name: 'example',
+    permissions: [PermissionFlagsBits.ManageGuild],
+    developerBypass: true
+});
+```
+
+Với slash command dùng `setDefaultMemberPermissions`, bot đăng ký command có `developerBypass: true` mà không áp dụng bộ lọc quyền của Discord, sau đó tự kiểm tra quyền khi người dùng gọi lệnh. Vì thế người không đủ quyền có thể nhìn thấy command nhưng sẽ bị bot từ chối khi dùng.
