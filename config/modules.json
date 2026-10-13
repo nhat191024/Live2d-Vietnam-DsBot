@@ -37,6 +37,12 @@
             "dependencies": [
                 "Database"
             ]
+        },
+        "scamTrap": {
+            "enabled": true,
+            "description": "Trap channel with temporary bans and admin alerts",
+            "category": "Moderation",
+            "dependencies": ["Database"]
         }
     },
     "settings": {
